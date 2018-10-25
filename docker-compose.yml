@@ -22,16 +22,6 @@ services:
       - mysql
       - redis
 
-  php-cli:
-    build: docker/php-cli
-    container_name: php-cli
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www
-    links:
-      - mysql
-      - redis
-
   node:
     image: node:8.6-alpine
     container_name: node
@@ -59,4 +49,3 @@ services:
       - MYSQL_PASSWORD=secret
     ports:
       - "33061:3306"
-
