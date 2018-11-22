@@ -5,28 +5,33 @@ services:
     container_name: nginx
     working_dir: /var/www
     volumes:
-      - .:/var/www
-      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    - .:/var/www
+    - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - "8080:80"
+    - "8080:80"
     links:
-      - php-fpm
+    - php-fpm
 
   php-fpm:
     build: docker/php-fpm
     container_name: php-fpm
     working_dir: /var/www
     volumes:
-      - .:/var/www
+    - .:/var/www
     links:
-      - mysql
-      - redis
-
+    - mysql
+    - redis
+    environment:
+    - "DB_PORT=3306"
+    - "DB_HOST=mysql"
+    - "REDIS_PORT=6379"
+    - "REDIS_HOST=redis"
+    user: ${CURRENT_UID}
   node:
-    image: node:8.6-alpine
+    image: node:latest
     container_name: node
     volumes:
-      - ./:/var/www
+    - ./:/var/www
     working_dir: /var/www
     tty: true
 
@@ -34,18 +39,16 @@ services:
     image: redis:alpine
     container_name: redis
     ports:
-      - "63791:6379"
+    - "63791:6379"
 
   mysql:
-    image: mysql:8.0
-    container_name: mysql
-    working_dir: /var/www
+    image: mysql:5.7
     volumes:
-      - ./application/:/var/www
+    - ./storage/mysql:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=app
-      - MYSQL_USER=app
-      - MYSQL_PASSWORD=secret
+    - "MYSQL_ROOT_PASSWORD=secret"
+    - "MYSQL_USER=app"
+    - "MYSQL_PASSWORD=secret"
+    - "MYSQL_DATABASE=app"
     ports:
-      - "33061:3306"
+    - "33061:3306"
